@@ -1,1 +1,557 @@
-# Wvvv
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月经周期记录助手 - 2025</title>
+    <style>
+        :root {
+            --primary: #ff9bc9;
+            --secondary: #c5a3ff;
+            --accent: #7fdbda;
+            --light: #f8f4ff;
+            --dark: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #faf7fc;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 30px;
+            padding: 5px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #777;
+        }
+        
+        .history-item {
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .symptom-tag {
+            display: inline-block;
+            background-color: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-weekday {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            color: var(--dark);
+        }
+        
+        .calendar-day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .calendar-day.period {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .calendar-day.fertile {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .calendar-day.predicted {
+            background-color: #ffd9e7;
+            color: var(--dark);
+        }
+        
+        .calendar-day.has-note::after {
+            content: "";
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            h1 {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>月经周期记录助手 - 2025</h1>
+                <div id="current-date">2025年1月15日</div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="nav-tabs">
+            <div class="tab active" data-tab="overview">总览</div>
+            <div class="tab" data-tab="log">记录经期</div>
+            <div class="tab" data-tab="history">历史记录</div>
+            <div class="tab" data-tab="calendar">日历视图</div>
+        </div>
+        
+        <div class="tab-content active" id="overview">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">平均周期长度</div>
+                    <div class="stat-value" id="cycle-length">28天</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均经期长度</div>
+                    <div class="stat-value" id="period-length">5天</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">预测下次经期</div>
+                    <div class="stat-value" id="next-period">1月20日</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">预计排卵日</div>
+                    <div class="stat-value" id="ovulation-day">2月2日</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">今日状态</h2>
+                <p id="today-status">您目前不在经期内。预测下次经期将在5天后开始。</p>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">最近一次记录</h2>
+                <div class="history-item">
+                    <strong>2024年12月25日 - 12月29日</strong> (5天)
+                    <div>
+                        <span class="symptom-tag">腹痛</span>
+                        <span class="symptom-tag">疲劳</span>
+                    </div>
+                    <p>经量前两天较多，后三天减少。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="log">
+            <div class="card">
+                <h2 class="card-title">记录新经期</h2>
+                <form id="period-form">
+                    <div class="form-group">
+                        <label for="start-date">开始日期</label>
+                        <input type="date" id="start-date" required value="2025-01-20">
+                    </div>
+                    <div class="form-group">
+                        <label for="end-date">结束日期</label>
+                        <input type="date" id="end-date" required value="2025-01-25">
+                    </div>
+                    <div class="form-group">
+                        <label for="symptoms">症状</label>
+                        <select id="symptoms" multiple>
+                            <option value="cramps">腹痛/抽筋</option>
+                            <option value="headache">头痛</option>
+                            <option value="backache">腰痛</option>
+                            <option value="fatigue">疲劳</option>
+                            <option value="mood">情绪波动</option>
+                            <option value="acne">痤疮</option>
+                            <option value="cravings">食欲变化</option>
+                        </select>
+                        <small>按住Ctrl键可选择多个症状</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="flow">经量</label>
+                        <select id="flow">
+                            <option value="light">较少</option>
+                            <option value="medium" selected>中等</option>
+                            <option value="heavy">较多</option>
+                            <option value="very-heavy">非常多</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">备注</label>
+                        <textarea id="notes" rows="3" placeholder="记录任何额外的信息..."></textarea>
+                    </div>
+                    <button type="submit">保存记录</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="history">
+            <div class="card">
+                <h2 class="card-title">历史记录</h2>
+                <div id="history-list">
+                    <div class="history-item">
+                        <strong>2024年12月25日 - 12月29日</strong> (5天)
+                        <div>
+                            <span class="symptom-tag">腹痛</span>
+                            <span class="symptom-tag">疲劳</span>
+                        </div>
+                        <p>经量前两天较多，后三天减少。</p>
+                    </div>
+                    <div class="history-item">
+                        <strong>2024年11月27日 - 12月1日</strong> (5天)
+                        <div>
+                            <span class="symptom-tag">头痛</span>
+                            <span class="symptom-tag">情绪波动</span>
+                        </div>
+                        <p>经量中等。</p>
+                    </div>
+                    <div class="history-item">
+                        <strong>2024年10月30日 - 11月3日</strong> (5天)
+                        <div>
+                            <span class="symptom-tag">腰痛</span>
+                        </div>
+                        <p>经量前两天较多。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="calendar">
+            <div class="card">
+                <h2 class="card-title">2025年月经日历</h2>
+                <div class="calendar-header">
+                    <button id="prev-month">&lt; 上个月</button>
+                    <h3 id="current-month">2025年1月</h3>
+                    <button id="next-month">下个月 &gt;</button>
+                </div>
+                <div class="calendar">
+                    <div class="calendar-weekday">日</div>
+                    <div class="calendar-weekday">一</div>
+                    <div class="calendar-weekday">二</div>
+                    <div class="calendar-weekday">三</div>
+                    <div class="calendar-weekday">四</div>
+                    <div class="calendar-weekday">五</div>
+                    <div class="calendar-weekday">六</div>
+                    
+                    <!-- 日历日期将由JavaScript动态生成 -->
+                    <div id="calendar-days" class="calendar-days"></div>
+                </div>
+                <div style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 15px; height: 15px; background-color: var(--primary); border-radius: 50%; margin-right: 5px;"></div>
+                        <span>经期</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 15px; height: 15px; background-color: var(--accent); border-radius: 50%; margin-right: 5px;"></div>
+                        <span>易孕期</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 15px; height: 15px; background-color: #ffd9e7; border-radius: 50%; margin-right: 5px;"></div>
+                        <span>预测经期</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>月经周期记录助手 &copy; 2025 | 设计用于帮助女性跟踪月经周期和健康状况</p>
+            <p>注意：此工具仅供参考，不能替代专业医疗建议。</p>
+        </div>
+    </footer>
+
+    <script>
+        // 设置当前日期为2025年
+        const now = new Date(2025, 0, 15); // 2025年1月15日
+        document.getElementById('current-date').textContent = now.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // 选项卡切换功能
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // 更新活动选项卡
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                // 如果切换到日历标签，重新渲染日历
+                if (tabId === 'calendar') {
+                    renderCalendar(currentMonth, currentYear);
+                }
+            });
+        });
+        
+        // 日历功能
+        let currentMonth = now.getMonth();
+        let currentYear = now.getFullYear();
+        
+        // 渲染日历
+        function renderCalendar(month, year) {
+            const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+            document.getElementById('current-month').textContent = year + "年" + monthNames[month];
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            // 获取第一天是星期几 (0 = 周日, 1 = 周一, ...)
+            const firstDayIndex = firstDay.getDay();
+            
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
+            
+            // 填充空白（上个月的天数）
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.classList.add('calendar-day');
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // 填充当前月的天数
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.classList.add('calendar-day');
+                day.textContent = i;
+                
+                // 标记预测的经期 (1月20-25日)
+                if (year === 2025 && month === 0 && i >= 20 && i <= 25) {
+                    day.classList.add('predicted');
+                }
+                
+                // 标记预测的易孕期 (2月2日左右)
+                if (year === 2025 && month === 1 && i >= 30) {
+                    day.classList.add('fertile');
+                }
+                if (year === 2025 && month === 0 && i >= 28) {
+                    day.classList.add('fertile');
+                }
+                
+                // 标记历史经期
+                if (year === 2024 && month === 11 && i >= 25 && i <= 29) {
+                    day.classList.add('period');
+                    day.classList.add('has-note');
+                }
+                
+                calendarDays.appendChild(day);
+            }
+        }
+        
+        // 初始渲染日历
+        renderCalendar(currentMonth, currentYear);
+        
+        // 上个月/下个月按钮事件
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentMonth, currentYear);
+        });
+        
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentMonth, currentYear);
+        });
+        
+        // 表单提交
+        document.getElementById('period-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('经期记录已保存！');
+            // 在实际应用中，这里会将数据保存到本地存储或数据库
+        });
+    </script>
+</body>
+</html>
